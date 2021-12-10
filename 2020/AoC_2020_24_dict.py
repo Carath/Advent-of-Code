@@ -18,11 +18,93 @@
 # - A cell is stored as a pair (key, value), where the key is the cell 2D coordinates, and the value is the cell status,
 #   stored as a boolean.
 # - Be careful to not manually set a cell to life by doing 'cells[coord] = True', as this will not consider the cell
-#   neighbourhood! Use the 'addCell(cells, coord)' function instead.
+#   neighbourhood! Use the 'game.addCell(cells, coord)' function instead.
 
 ############################################################
+# Generic functions:
 
-import functools
+class GameOfLife:
+	def __init__(self, customRules, getNeighbourhood):
+		self.customRules = customRules
+		self.getNeighbourhood = getNeighbourhood
+
+	def isAlive(self, cells, coord):
+		return coord in cells and cells[coord]
+
+	def countAliveCells(self, cells):
+		return self.countAliveFromCoords(cells, cells.keys())
+
+	def countAliveFromCoords(self, cells, coordList):
+		count = 0
+		for coord in coordList:
+			if self.isAlive(cells, coord):
+				count += 1
+		return count
+
+	def addCell(self, cells, coord):
+		neighbours = self.getNeighbourhood(*coord)
+		self.activate(cells, coord, neighbours)
+
+	def activate(self, cells, coord, neighbours):
+		cells[coord] = True
+		for c in neighbours:
+			if not c in cells:
+				cells[c] = False
+
+	def updateCell(self, cells, coord, status, count, neighbours):
+		r = self.customRules(status, count)
+		if r == -1: # cell goes dead. Do not remove it!
+			cells[coord] = False
+		elif r == 1: # cell goes live.
+			self.activate(cells, coord, neighbours)
+
+	def cleanupCell(self, cells, coord, status, count, neighbours):
+		if not status and count == 0:
+			del cells[coord]
+
+	# Removing totally dead cells. This _cannot_ be done while updating the cells
+	# without creating side effects. Also, note that this is somewhate expensive,
+	# better do it only once in a while to free memory:
+	def cleanup(self, cells):
+		size = len(cells.keys())
+		self.apply(cells, self.cleanupCell)
+		print("Freed", size - len(cells.keys()), "cells.")
+
+	# Apply an action simultaneously on each cell, without side effects:
+	def apply(self, cells, action):
+		cellsCopy = cells.copy()
+		for coord in cellsCopy:
+			neighbours = self.getNeighbourhood(*coord)
+			status = self.isAlive(cellsCopy, coord)
+			count = self.countAliveFromCoords(cellsCopy, neighbours)
+			action(cells, coord, status, count, neighbours)
+
+	def run(self, cells, epochsNumber, cleanupCooldown=50, enableCleanup=True):
+		for epoch in range(epochsNumber):
+			if enableCleanup and epoch > 0 and epoch % cleanupCooldown == 0:
+				self.cleanup(cells)
+			self.apply(cells, self.updateCell)
+		if enableCleanup:
+			self.cleanup(cells)
+
+############################################################
+# Problem dependant:
+
+# Rule governing the life and death of a cell, knowing its status
+# and the number of alive neighbour cells.
+def rules(status, count):
+	if status and (count == 0 or count > 2): # cell dies.
+		return -1
+	elif not status and count == 2: # cell lives!
+		return 1
+	return 0 # cell doesn't change.
+
+# Hexagonal neighbourhood, mapped to a regular grid:
+def neighbourhood(x, y):
+	return [(x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y)]
+
+############################################################
+# Getting instructions:
 
 print("\nPart 1:\n")
 
@@ -32,14 +114,6 @@ def get_lines(filename):
 	file.close()
 	# print(lines)
 	return lines
-
-# filename = "resources/example_24"
-filename = "resources/input_24"
-
-lines = get_lines(filename)
-
-############################################################
-# Getting instructions:
 
 direction_list = ["nw", "ne", "w", "e", "sw", "se"] # hex grid
 
@@ -63,98 +137,21 @@ def get_directions(string):
 		i = j
 	return directions
 
-instructions = list(map(get_directions, lines))
-
-print("Instructions number:", len(instructions))
-# print(*instructions, sep='\n')
-
-def init(cells, instructions):
+def init(game, cells, instructions):
 	for instr in instructions:
 		dest = (0, 0)
 		for direc in instr:
 			coord_next = get_coord_next(direc)
 			dest = (dest[0] + coord_next[0], dest[1] + coord_next[1])
-		if isAlive(cells, dest):
+		if game.isAlive(cells, dest):
 			cells[dest] = False
 		else:
-			addCell(cells, dest)
-
-############################################################
-# Generic functions:
-
-isAlive = lambda cells, coord : coord in cells and cells[coord]
-countAliveCells = lambda cells : countAliveFromCoords(cells, cells.keys())
-
-def countAliveFromCoords(cells, coordList):
-	count = 0
-	for coord in coordList:
-		if isAlive(cells, coord):
-			count += 1
-	return count
-
-def addCell(cells, coord):
-	neighbours = neighbourhood(*coord)
-	activate(cells, coord, neighbours)
-
-def activate(cells, coord, neighbours):
-	cells[coord] = True
-	for c in neighbours:
-		if not c in cells:
-			cells[c] = False
-
-def updateCell(cells, coord, status, count, neighbours):
-	r = rules(status, count)
-	if r == -1: # cell goes dead. Do not remove it!
-		cells[coord] = False
-	elif r == 1: # cell goes live.
-		activate(cells, coord, neighbours)
-
-def cleanupCell(cells, coord, status, count, neighbours):
-	if not status and count == 0:
-		del cells[coord]
-
-# Removing totally dead cells. This _cannot_ be done while updating the cells
-# without creating side effects. Also, note that this is somewhate expensive,
-# better do it only once in a while to free memory:
-def cleanup(cells):
-	size = len(cells.keys())
-	apply(cells, cleanupCell)
-	print("Freed", size - len(cells.keys()), "cells.")
-
-# Apply an action simultaneously on each cell, without side effects:
-def apply(cells, action):
-	cellsCopy = cells.copy()
-	for coord in cellsCopy:
-		neighbours = neighbourhood(*coord)
-		status = isAlive(cellsCopy, coord)
-		count = countAliveFromCoords(cellsCopy, neighbours)
-		action(cells, coord, status, count, neighbours)
-
-def run(cells, epochsNumber, cleanupCooldown):
-	for epoch in range(epochsNumber):
-		if epoch % cleanupCooldown == 0:
-			cleanup(cells)
-		apply(cells, updateCell)
-	cleanup(cells)
-
-############################################################
-# Problem dependant:
-
-# Rule governing the life and death of a cell, knowing its status
-# and the number of alive neighbour cells.
-def rules(status, count):
-	if status and (count == 0 or count > 2): # cell dies.
-		return -1
-	elif not status and count == 2: # cell lives!
-		return 1
-	return 0 # cell doesn't change.
-
-# Hexagonal neighbourhood, mapped to a regular grid:
-def neighbourhood(x, y):
-	return [(x-1, y), (x-1, y+1), (x, y-1), (x, y+1), (x+1, y-1), (x+1, y)]
+			game.addCell(cells, dest)
 
 ############################################################
 # Printing:
+
+import functools
 
 concatenation = lambda strings : functools.reduce(lambda str1, str2 : str1 + str2, strings)
 
@@ -176,16 +173,30 @@ def printCurrentState(cells, x, y, width, height):
 ############################################################
 # Testing:
 
-cells = {}
-init(cells, instructions)
-printCurrentState(cells, -20, -20, 40, 40)
-print("Alive cells number:", countAliveCells(cells))
+if __name__ == '__main__':
 
-print("\nPart 2:\n")
+	game = GameOfLife(rules, neighbourhood)
 
-epochsNumber = 100 # output: 3711
-# epochsNumber = 250 # output: 17038
-cleanupCooldown = 50
+	# filename = "resources/example_24"
+	filename = "resources/input_24"
 
-run(cells, epochsNumber, cleanupCooldown)
-print("Alive cells number:", countAliveCells(cells))
+	lines = get_lines(filename)
+
+	instructions = list(map(get_directions, lines))
+
+	print("Instructions number:", len(instructions))
+	# print(*instructions, sep='\n')
+
+	cells = {}
+	init(game, cells, instructions)
+	printCurrentState(cells, -20, -20, 40, 40)
+	print("Alive cells number:", game.countAliveCells(cells))
+
+	print("\nPart 2:\n")
+
+	epochsNumber = 100 # output: 3711
+	# epochsNumber = 250 # output: 17038
+	cleanupCooldown = 50
+
+	game.run(cells, epochsNumber, cleanupCooldown)
+	print("Alive cells number:", game.countAliveCells(cells))
