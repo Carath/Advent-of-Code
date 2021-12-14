@@ -48,10 +48,12 @@ def rules(status, count):
 		return 1
 	return 0 # cell doesn't change.
 
+isInGrid = lambda c : c[0] in range(5) and c[1] in range(5)
+
 # Peculiar neighbourhood on a 5x5 grid:
 def neighbourhood(x, y, z):
 	neighbours = [(x-1, y, z), (x, y-1, z), (x, y+1, z), (x+1, y, z)]
-	return list(filter(lambda c : 0 <= c[0] and c[0] < 5 and 0 <= c[1] and c[1] < 5, neighbours))
+	return list(filter(isInGrid, neighbours))
 
 def detectRedundancy(game, cells):
 	history, epoch = {}, 0

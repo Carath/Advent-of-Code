@@ -7,7 +7,7 @@ inputData = list(filter(lambda s : s != '', inputData))
 # print('inputData:', inputData)
 
 def neighbourhood(row, col, rows, cols):
-	isInGrid = lambda coord : 0 <= coord[0] and coord[0] < rows and 0 <= coord[1] and coord[1] < cols
+	isInGrid = lambda coord : coord[0] in range(rows) and coord[1] in range(cols)
 	neighbors = [(row-1, col), (row, col-1), (row, col+1), (row+1, col)]
 	return list(filter(isInGrid, neighbors))
 

@@ -17,7 +17,7 @@ def readValue(program, relativeBase, val, mode):
 			print('Unsupported mode in readValue():', mode)
 			exit()
 	except:
-		print('Out of bound access in readValue() for mode:', mode)
+		print('Out of bound access in readValue() for mode: %d. Try allocating more space!' % mode)
 		exit()
 
 def writeValue(program, relativeBase, address, val, mode):
@@ -33,16 +33,15 @@ def writeValue(program, relativeBase, address, val, mode):
 			print('Unsupported mode in writeValue():', mode)
 			exit()
 	except:
-		print('Out of bound access in writeValue() for mode:', mode)
+		print('Out of bound access in writeValue() for mode: %d. Try allocating more space!' % mode)
 		exit()
 
 # Program modifies itself, but a new copy is returned!
 # 2 values are returned: the outputs and the new program, unless some inputs are
 # missing, in that case a third value being the current program index is returned.
-def run(program, inputs, start=0):
+def run(program, inputs, start=0, verbose=False):
 	program = program[:] # copying, preventing side effects!
-	i, relativeBase, inputIndex = start, 0, 0
-	outputs = []
+	i, relativeBase, inputIndex, outputs = start, 0, 0, []
 	while i < len(program):
 		opcode, params = program[i] % 100, program[i] // 100
 		param1, param2, param3 = params % 10, (params // 10) % 10, params // 100
@@ -68,7 +67,8 @@ def run(program, inputs, start=0):
 			writeValue(program, relativeBase, dest, val1 * val2, param3)
 		elif opcode == 3: # writing input
 			if inputIndex >= len(inputs):
-				# print('Missing an input at rank %d!' % i)
+				if verbose:
+					print('Missing an input at rank %d!' % i)
 				return outputs, program, i # returning an additional value: the current program index.
 			writeValue(program, relativeBase, dest, inputs[inputIndex], param1)
 			inputIndex += 1
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 	stringInput = getFileLines(inputFile)[0]
 	print(stringInput, '\n')
 	program = getInput(stringInput)
-	program += [0] * 1000000
+	program += [0] * 100000
 
 	outputs = run(program, [1])[0]
 	print('Outputs:', outputs) # 3429606717
