@@ -39,7 +39,7 @@ def findCandidate(inputData, roundUp):
 	size, i = len(inputData[0]), 0
 	while len(candidates) >= 2 and i < size:
 		bit = getRankBit(candidates, i, roundUp)
-		candidates = list(filter(lambda l : l[i] == bit, candidates))
+		candidates = [ l for l in candidates if l[i] == bit ]
 		i += 1
 	print('Found:', candidates[0])
 	return arrayToRadix(candidates[0], 2)

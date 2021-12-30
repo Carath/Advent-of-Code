@@ -40,10 +40,9 @@ outputs, newProg = answer[0], answer[1]
 # '''
 
 gridString = ''.join([ chr(value) for value in outputs])
-
 print(gridString)
 
-grid = list(filter(lambda s : s != '', gridString.split('\n')))
+grid = [ s for s in gridString.split('\n') if s != '' ]
 # print(*grid, sep='\n')
 
 isInGrid = lambda coord : coord[0] in range(len(grid)) and coord[1] in range(len(grid[0]))
@@ -122,7 +121,7 @@ def buildSegment(grid, startPos, direction):
 		lastPos, coord, subpathLength = coord, newCoord, subpathLength + 1
 	# print('Stop!', coord, ', len:', subpathLength)
 	neighbors = neighbourhood(*coord)
-	candidates = list(filter(lambda coord : coord != lastPos, neighbors))
+	candidates = [ coord for coord in neighbors if coord != lastPos ]
 	if candidates == []:
 		print('End reached!')
 		return coord, (0, 0), '', subpathLength
@@ -164,7 +163,7 @@ def countAppearances(sequence, chunks):
 			else:
 				i += 1
 		newChunks.append((chunkOffset+lastIndex, chunk[lastIndex :])) # last new chunk!
-	newChunks = list(filter(lambda c : c[1] != [], newChunks))
+	newChunks = [ chunk for chunk in newChunks if chunk[1] != [] ]
 	return count, anchors, newChunks
 
 # Finds at most 'depth' subsequences of a given list whose repeats yield said list:

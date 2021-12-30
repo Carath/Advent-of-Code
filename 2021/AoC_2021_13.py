@@ -3,9 +3,8 @@ def getFileContent(path):
 		return file.read()
 
 def parseData(inputData):
-	inputData = inputData.split('\n\n')
-	inputData = [ list(filter(lambda s : s != '', s.split('\n'))) for s in inputData ]
-	inputData = list(filter(lambda s : s != '', inputData))
+	inputData = [ [ s for s in data.split('\n') if s != '' ] for data in inputData.split('\n\n') ]
+	inputData = [ data for data in inputData if data != [] ]
 	dots, instructions = inputData
 	dots = [ dot.split(',') for dot in dots ]
 	dots = [ [int(dot[0]), int(dot[1])] for dot in dots ]

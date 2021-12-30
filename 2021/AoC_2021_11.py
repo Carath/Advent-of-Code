@@ -3,8 +3,7 @@ def getFileContent(path):
 		return file.read()
 
 def getGrid(string):
-	grid = list(filter(lambda s : s != '', string.split('\n')))
-	grid = [ list(row) for row in grid ]
+	grid = [ list(s) for s in string.split('\n') if s != '' ]
 	grid = [ [ int(col) for col in row ] for row in grid ]
 	return grid
 
@@ -15,7 +14,8 @@ def neighbourhood(row, col):
 	for i in range(-1, 2):
 		for j in range(-1, 2):
 			if isInGrid(row+i, col+j):
-				neighbors.append((row+i, col+j))
+				if i != 0 or j != 0:
+					neighbors.append((row+i, col+j))
 	return neighbors
 
 def riseEnergyLevel(grid, hasExploded, coord):

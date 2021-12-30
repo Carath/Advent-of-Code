@@ -3,8 +3,8 @@ def getFileContent(path):
 		return file.read()
 
 def getTemplateAndRules(inputData):
-	inputData = list(filter(lambda s : s != '', inputData.split('\n\n')))
-	inputData = [ list(filter(lambda s : s != '', line.split('\n'))) for line in inputData ]
+	inputData = [ s for s in inputData.split('\n\n') if s != '' ]
+	inputData = [ [ s for s in line.split('\n') if s != '' ] for line in inputData ]
 	template = inputData[0][0]
 	rules = [ s.split(' -> ') for s in inputData[1] ]
 	return template, rules

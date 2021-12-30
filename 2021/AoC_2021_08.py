@@ -10,7 +10,6 @@ inputData = [ s.split(' | ') for s in inputData ]
 inputData = [ [ c.split(' ') for c in line ] for line in inputData ]
 # print(*inputData, sep='\n')
 
-
 def getLengthMap(signalDigits):
 	lengthMap = { length : [] for length in range(2, 8) }
 	for s in signalDigits:

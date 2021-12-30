@@ -3,8 +3,7 @@ def getFileLines(path):
 		return file.read().splitlines()
 
 inputData = getFileLines('resources/input_02.txt')
-inputData = list(filter(lambda s : s != '', inputData))
-inputData = list(map(lambda s : s.split(' '), inputData))
+inputData = [ s.split(' ') for s in inputData if s != '' ]
 # print(inputData)
 
 def computePos(data):

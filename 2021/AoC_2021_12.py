@@ -16,8 +16,7 @@ def getFileLines(path):
 
 inputData = getFileLines('resources/input_12.txt')
 
-entries = list(filter(lambda s : s != '', inputData))
-entries = [ entry.split('-') for entry in entries ]
+entries = [ entry.split('-') for entry in inputData if entry != '' ]
 print('entries:', entries)
 
 def getNodes(entries):
@@ -113,4 +112,4 @@ def numberAllowedVisit(node, path, smallCaves):
 
 foundPaths = []
 findAllPaths(foundPaths, incidenceMap, Path())
-printFoundPaths(foundPaths, verbose=False) # 137948
+printFoundPaths(foundPaths, verbose=False) # 137948 in 1.3s

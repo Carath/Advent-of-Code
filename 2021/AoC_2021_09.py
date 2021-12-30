@@ -3,7 +3,7 @@ def getFileLines(path):
 		return file.read().splitlines()
 
 inputData = getFileLines('resources/input_09.txt')
-inputData = list(filter(lambda s : s != '', inputData))
+inputData = [ s for s in inputData if s != '' ]
 # print('inputData:', inputData)
 
 def neighbourhood(row, col, rows, cols):

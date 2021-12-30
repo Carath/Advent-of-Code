@@ -49,7 +49,7 @@ def simplifyExpression(string):
 		print('Valid string.\n')
 		return (-1, '.'), items
 	else:
-		closingChars = list(filter(lambda c : isClosingChar(c[1]), items))
+		closingChars = [ c for c in items if isClosingChar(c[1]) ]
 		if closingChars == []:
 			print('Incomplete string:', newString, '\n')
 			return (-1, '.'), items
@@ -57,21 +57,18 @@ def simplifyExpression(string):
 			print('Corrupted string:', newString, '\n')
 			return closingChars[0], items
 
-def computeIllegalCharsScore(simplifiedData):
+def computeIllegalCharsScore(inputData):
 	score = 0
-	for data in simplifiedData:
+	for data in inputData:
 		if data[0] != (-1, '.'):
 			score += scoreIllegalChar(data[0][1])
 	return score
 
 # inputData = getFileLines('resources/example_10.txt')
 inputData = getFileLines('resources/input_10.txt')
-inputData = list(filter(lambda s : s != '', inputData))
-print('\n', inputData, '\n')
+inputData = [ simplifyExpression(s) for s in inputData if s != '' ]
 
-simplifiedData = [ simplifyExpression(s) for s in inputData ]
-
-score = computeIllegalCharsScore(simplifiedData)
+score = computeIllegalCharsScore(inputData)
 print('Illegal chars score:', score, '\n') # 266301
 
 # ------------------------------------------
@@ -88,9 +85,9 @@ def scoreMissingChar(char):
 		return 4
 	return 0 # default
 
-def computeMissingCharsScore(simplifiedData):
+def computeMissingCharsScore(inputData):
 	scoresList = []
-	for data in simplifiedData:
+	for data in inputData:
 		if data[0] == (-1, '.') and data[1] != []:
 			missing = list(reversed([ closingChar(c[1]) for c in data[1] ]))
 			newString = ''.join(missing)
@@ -103,5 +100,5 @@ def computeMissingCharsScore(simplifiedData):
 	print('\nScores list:', scoresList)
 	return scoresList[len(scoresList) // 2]
 
-score = computeMissingCharsScore(simplifiedData)
+score = computeMissingCharsScore(inputData)
 print('\nMissing chars score:', score) # 3404870164

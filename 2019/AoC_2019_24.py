@@ -3,12 +3,9 @@ sys.path.insert(0, '../2020/')
 from AoC_2020_24_dict import GameOfLife
 
 def stringToCellsList(string):
-	rows = list(filter(lambda s : s != '', string.split('\n')))
-	cellsList = []
+	rows, cellsList = [ s for s in string.split('\n') if s != '' ], []
 	for row in range(len(rows)):
-		cellsRow = list(filter(lambda c : c[1] == '#', enumerate(rows[row])))
-		cellsRow = [ (c[0], row, 0) for c in cellsRow ]
-		cellsList.extend(cellsRow)
+		cellsList.extend([ (c[0], row, 0) for c in enumerate(rows[row]) if c[1] == '#' ])
 	return cellsList
 
 def getCells(game, string):
@@ -17,15 +14,6 @@ def getCells(game, string):
 	for c in cellsList:
 		game.addCell(cells, c)
 	return cells
-
-# Only keeping alive cells, and sorted to have a unique representation:
-def cellsToCellsList(cells):
-	aliveCells = filter(lambda cell : cell[1], cells.items())
-	return sorted([ cell[0] for cell in aliveCells ])
-
-def cellsToString(cells):
-	cellsList = cellsToCellsList(cells)
-	return ','.join([ str(cell) for cell in cellsList ])
 
 def getCellsGrid(cells, zLevel):
 	grid = [ ['.'] * 5 for row in range(5)]
@@ -58,13 +46,14 @@ def neighbourhood(x, y, z):
 def detectRedundancy(game, cells):
 	history, epoch = {}, 0
 	while True:
-		# The following string uniquely define the current state, since cellsToCellsList()
-		# keeps only alive cells, sorted by lexicographic order on x, y, z.
-		string = cellsToString(cells)
-		if string in history:
-			print('\nRedundancy found at epoch %d:\n' % epoch, string)
-			return history[string]
-		history[string] = cells.copy()
+		# A unique identifier of the current state is created by taking live cells only (dead cells number
+		# depends on the cleaning schedule), and sorting them by lexicographic order on x, y, z:
+		liveCells = game.getALiveCells(cells)
+		key = tuple(sorted(liveCells))
+		if key in history:
+			print('\nRedundancy found at epoch %d:\n' % epoch, key)
+			return history[key]
+		history[key] = cells.copy()
 		game.run(cells, 1, enableCleanup=False)
 		epoch += 1
 
@@ -97,7 +86,6 @@ cells = getCells(game, inputData)
 print('\ncells:', cells)
 
 printCells(cells, 0)
-print('String identifier:', cellsToString(cells))
 
 redundancy = detectRedundancy(game, cells)
 print(redundancy)
@@ -150,4 +138,4 @@ cells = getCells(gameRecursive, inputData)
 gameRecursive.run(cells, 200)
 
 aliveCellsNumber = gameRecursive.countAliveCells(cells)
-print('\nResult:', aliveCellsNumber) # 1977
+print('\nResult:', aliveCellsNumber) # 1977 in 1.4s

@@ -15,21 +15,26 @@
 # - Cells change of status do not depend on the order in which they are parsed - they evolve simultaneously.
 # - One cannot remove a dead cell from the dictionary in the midst of an epoch, even if none of its neighbours are
 #   alive, for some of them may become alive later in the same epoch, thus potentially allowing the lone cell to live.
-# - A cell is stored as a pair (key, value), where the key is the cell 2D coordinates, and the value is the cell status,
-#   stored as a boolean.
+# - A cell is stored as a pair (key, value), where the key is any hashable type (e.g 2D coordinates), and the value
+#   is the cell status, stored as a boolean.
 # - Be careful to not manually set a cell to life by doing 'cells[coord] = True', as this will not consider the cell
 #   neighbourhood! Use the 'game.addCell(cells, coord)' function instead.
+# - Careful, neighbourhoods must _not_ contain their center cell!
 
 ############################################################
 # Generic functions:
 
 class GameOfLife:
+
 	def __init__(self, customRules, getNeighbourhood):
 		self.customRules = customRules
 		self.getNeighbourhood = getNeighbourhood
 
 	def isAlive(self, cells, coord):
 		return coord in cells and cells[coord]
+
+	def getALiveCells(self, cells):
+		return [ coord for coord in cells if cells[coord] ]
 
 	def countAliveCells(self, cells):
 		return self.countAliveFromCoords(cells, cells.keys())

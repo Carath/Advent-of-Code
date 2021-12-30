@@ -6,8 +6,8 @@ def getData(string):
 	blocs = string.split('\n\n')
 	drawnNumbers = [ int(s) for s in blocs[0].split(',') ]
 	blocs = [ bloc.split('\n') for bloc in blocs[1:] ]
-	blocs = [ list(filter(lambda s : s != '', bloc)) for bloc in blocs ] # for trailing newlines at the end.
-	blocs = [ [ list(filter(lambda s : s != '', row.split(' '))) for row in bloc ] for bloc in blocs ]
+	blocs = [ [ s for s in bloc if s != '' ] for bloc in blocs ] # for trailing newlines at the end.
+	blocs = [ [ [ s for s in row.split(' ') if s != '' ] for row in bloc ] for bloc in blocs ]
 	boardsMatrixList = [ [ [ int(s) for s in row ] for row in bloc ] for bloc in blocs ]
 	size = len(boardsMatrixList[0][0])
 	return size, drawnNumbers, boardsMatrixList

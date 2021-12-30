@@ -13,3 +13,5 @@ Run the following command to install some needed packages:
 ```
 pip3 install -r requirements.txt
 ```
+
+Tested on Linux (Ubuntu)

@@ -3,8 +3,7 @@ def getFileLines(path):
 		return file.read().splitlines()
 
 inputData = getFileLines('resources/input_05.txt')
-inputData = list(filter(lambda s : s != '', inputData))
-inputData = [ s.split(' -> ') for s in inputData ]
+inputData = [ s.split(' -> ') for s in inputData if s != '']
 inputData = [ [ col.split(',') for col in row ] for row in inputData ]
 inputData = [ [ [ int(c) for c in col ] for col in row ] for row in inputData ]
 print(*inputData, sep='\n')
