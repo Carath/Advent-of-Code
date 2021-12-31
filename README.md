@@ -3,8 +3,8 @@
 See <https://adventofcode.com/>
 
 <p float="left">
-	<img src="img/AoC_2020.png" width="624" height="512"/>
-	<img src="img/AoC_2021.png" width="624" height="512"/>
+	<img src="img/AoC_2020.png" width="390" height="320"/>
+	<img src="img/AoC_2021.png" width="390" height="320"/>
 </p>
 
 
