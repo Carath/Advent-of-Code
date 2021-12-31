@@ -1,6 +1,11 @@
+*My solutions to the Advent of Code puzzles.*
+
 See <https://adventofcode.com/>
 
-![](AoC_2020_calendar.png)
+<p float="left">
+	<img src="img/AoC_2020.png" width="624" height="512"/>
+	<img src="img/AoC_2021.png" width="624" height="512"/>
+</p>
 
 
 ## Dependencies
