@@ -19,8 +19,8 @@
 # Constants:
 targetColMap = { 'A' : 3, 'B' : 5, 'C' : 7, 'D' : 9 }
 charCostMap = { 'A' : 1, 'B' : 10, 'C' : 100, 'D' : 1000 }
-waintingTiles = [(1, 1), (1, 2), (1, 4), (1, 6), (1, 8), (1, 10), (1, 11)]
-print('waintingTiles:', waintingTiles)
+waitingTiles = [(1, 1), (1, 2), (1, 4), (1, 6), (1, 8), (1, 10), (1, 11)]
+print('waitingTiles:', waitingTiles)
 
 def printGrid(grid, cost=0):
 	lines = [ ''.join(row) for row in grid ]
@@ -69,7 +69,7 @@ def getPathLength(grid, start, end):
 	return abs(start[0] - end[0]) + abs(start[1] - end[1]) # manhattan distance
 
 # A further potential optimization could be done: preventing simple deadlocks.
-def visitStates(statesMap, grid, waintingTiles, agents):
+def visitStates(statesMap, grid, waitingTiles, agents):
 	# Careful! Do _not_ discard states with current best cost greater than the current greater cost of the final
 	# state. Indeed, both quantities may change over time, so (almost) every valid state should be explored.
 	for agentIdx in range(len(agents)):
@@ -83,7 +83,7 @@ def visitStates(statesMap, grid, waintingTiles, agents):
 			if freeRoomTile != None:
 				generateNewState(grid, agents, agentIdx, char, (row, col), freeRoomTile, True, stopover=(1, col))
 			else:
-				for tile in waintingTiles:
+				for tile in waitingTiles:
 					if grid[tile[0]][tile[1]] == '.':
 						generateNewState(grid, agents, agentIdx, char, (row, col), tile, False)
 
@@ -105,7 +105,7 @@ def generateNewState(grid, agents, agentIdx, char, coord, targetTile, agentParke
 	newGrid = [ row[:] for row in grid ]
 	newGrid[coord[0]][coord[1]] = '.'
 	newGrid[targetTile[0]][targetTile[1]] = char
-	visitStates(statesMap, newGrid, waintingTiles, newAgents)
+	visitStates(statesMap, newGrid, waitingTiles, newAgents)
 
 # Memoizing visited states:
 def stateRegistered(statesMap, agents, newAgents, moveCost):
@@ -174,7 +174,7 @@ printGrid(grid)
 
 agents = getAgents(grid)
 statesMap = { tuple(agents) : [0, {}] }
-visitStates(statesMap, grid, waintingTiles, agents)
+visitStates(statesMap, grid, waitingTiles, agents)
 
 path = buildAbestPath(statesMap)
 print('Path:', *path, sep='\n')
@@ -209,7 +209,7 @@ printGrid(grid)
 
 agents = getAgents(grid)
 statesMap = { tuple(agents) : [0, {}] }
-visitStates(statesMap, grid, waintingTiles, agents)
+visitStates(statesMap, grid, waitingTiles, agents)
 
 print('Best cost:', statesMap[()][0]) # 40954
 
