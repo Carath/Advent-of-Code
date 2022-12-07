@@ -9,13 +9,13 @@ content = getFileContent(path)
 content = [ x.split(" ") for x in content.split("\n") if x != "" ]
 # print(content)
 
-states = ["A", "B", "C"]
+states = { "A": 0, "B": 1, "C": 2 }
 
 convertLetter = lambda x : chr(ord(x) - 23)
 
 def score(choice):
 	opponent, our = choice
-	i, j = states.index(opponent), states.index(convertLetter(our))
+	i, j = states[opponent], states[convertLetter(our)]
 	if (i+1) % 3 == j: # win
 		return j + 7
 	elif i == j: # draw
@@ -31,7 +31,7 @@ print("\nResult:", result) # 13526
 
 def score_2(choice):
 	opponent, our = choice
-	i, j = states.index(opponent), states.index(convertLetter(our))
+	i, j = states[opponent], states[convertLetter(our)]
 	return 3 * j + (i+j-1) % 3 + 1
 
 result = sum([ score_2(x) for x in content ])
