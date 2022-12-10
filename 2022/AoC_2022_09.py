@@ -12,7 +12,7 @@ moves = [ line.split(" ") for line in getFileContent(path).split("\n") if line !
 sign = lambda x : x // abs(x) if x != 0 else 0
 
 def moveRope(knotsNumber):
-	knots = [ [0, 0] for i in range(knotsNumber) ]
+	knots = [ [0, 0] for i in range(knotsNumber) ] # coord system: (row, col) i.e (y, x)
 	visited = set([tuple(knots[0])])
 	for move in moves:
 		direc, steps = move[0], int(move[1])
